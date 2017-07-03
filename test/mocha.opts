@@ -1,0 +1,5 @@
+--require chai
+--require ./test/mocha_setup.js
+--reporter spec
+--ui bdd
+--recursive
