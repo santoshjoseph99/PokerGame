@@ -6,6 +6,11 @@ class Deck {
   index: number;
 
   constructor(){
+    this.reset();
+  }
+
+  reset() {
+    this.index = 0;
     this.cards = new Array(52);
     this.cards[0] = new Card('a', 's');
     this.cards[1] = new Card('2', 's');
@@ -62,7 +67,6 @@ class Deck {
     this.cards[49] = new Card('j', 'd');
     this.cards[50] = new Card('q', 'd');
     this.cards[51] = new Card('k', 'd');
-    this.index = 0;
   }
 
   getCards(): Card[] {
@@ -79,7 +83,10 @@ class Deck {
     }
   }
 
-  popCard(): Card {
+  popCard(): ?Card {
+    if(this.index > this.cards.length-1){
+      return null;
+    }
     return this.cards[this.index++];
   }
 }

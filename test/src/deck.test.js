@@ -37,8 +37,27 @@ describe('Deck', function(){
       expect(num).to.equal(4);
     });
 
-    it('', function(){
-      
-    })
-  })
+    it('popCards should return 52 cards then null', function(){
+      deck = new Deck();
+      let cards = deck.getCards();
+      for(let i=0; i < 52; i++){
+        let card = deck.popCard();
+        expect(card).to.be.not.null;
+      }
+      let nullCard = deck.popCard();
+      expect(nullCard).to.be.null;
+    });
+
+    context('when calling reset', function(){
+      it('sets the deck to the inital state', function(){
+        let deck1 = new Deck();
+        let deck2 = new Deck();
+        deck2.shuffle();
+        deck2.reset();
+        let card1 = deck1.popCard();
+        let card2 = deck2.popCard();
+        expect(card1).to.be.deep.equal(card2);
+      });
+    });
+  });
 })
