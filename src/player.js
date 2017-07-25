@@ -7,6 +7,7 @@ class Player {
   money: number;
   cards: Card[];
   sitOut: boolean;
+  name: string;
 }
 
 module.exports = Player;

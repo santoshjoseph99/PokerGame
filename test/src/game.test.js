@@ -1,8 +1,29 @@
 
 var Game = require('../../lib/game');
 var Player = require('../../lib/player');
+var Position = require('../../lib/position');
 
-describe.only('Game', function(){
+let createPlayerWithZeroMoney = () => {
+  let p = new Player();
+  p.money = 0;
+  p.sitOut = false;
+  return p;
+};
+
+let createValidPlayer = (blind) => {
+  let p = new Player();
+  p.money = 10*blind;
+  p.sitOut = false;
+  return p;
+}
+
+let createValidPosition = (blind, positionNum) => {
+  let player = createValidPlayer(blind);
+  let position = new Position(positionNum, player);
+  return position;
+}
+
+describe('Game', function(){
   context('when getting open positions', function(){
     context('when there are no players', function(){
       it('returns the number of open positions as table size', function(){
@@ -106,7 +127,7 @@ describe.only('Game', function(){
       it('does not start', function(){
         const gameSize = 3;
         game = new Game("NL Holdem", [], gameSize);
-        let result = game.startGame(3);
+        let result = game.startGame();
         expect(result).to.be.false
       })
     });
@@ -114,51 +135,92 @@ describe.only('Game', function(){
       it('does not start', function(){
         const gameSize = 3;
         game = new Game("NL Holdem", [], gameSize);
-        game.positions[0] = {num: 1, player: new Player()}
-        let result = game.startGame(3);
+        game.addPlayer(createValidPlayer(2));
+        let result = game.startGame();
         expect(result).to.be.false
       });
     });
     context('with 2 players', function(){
       it('game starts', function(){
         const gameSize = 3;
-        game = new Game("NL Holdem", [], gameSize);
-        game.positions[0] = {num: 1, player: new Player()}
-        game.positions[1] = {num: 1, player: new Player()}
-        let result = game.startGame(3);
+        game = new Game("NL Holdem", [3, 1], gameSize);
+        game.addPlayer(createValidPlayer(2));
+        game.addPlayer(createValidPlayer(2));
+        let result = game.startGame();
         expect(result).to.be.true
+        expect(game.getButton()).to.be.within(1, gameSize);
       });
     });
     context('with more then 2 players', function(){
       it('game starts', function(){
         const gameSize = 3;
-        game = new Game("NL Holdem", [], gameSize);
-        game.positions[0] = {num: 1, player: new Player()}
-        game.positions[1] = {num: 1, player: new Player()}
-        game.positions[2] = {num: 1, player: new Player()}
-        let result = game.startGame(3);
+        game = new Game("NL Holdem", [3, 1], gameSize);
+        game.addPlayer(createValidPlayer(2));
+        game.addPlayer(createValidPlayer(2));
+        game.addPlayer(createValidPlayer(2));
+        game.addPlayer(createValidPlayer(2));
+        let result = game.startGame();
         expect(result).to.be.true
+        expect(game.getButton()).to.be.within(1, gameSize);
       });
     });
   });
 
   context('when playing a hand', function(){
+    context('and not enough players', function(){
+      it('returns false', function(){
+        const gameSize = 3;
+        game = new Game("NL Holdem", [3, 1], gameSize);
+        game.addPlayer(createValidPlayer(3));
+        game.addPlayer(createValidPlayer(3));
+        game.addPlayer(createValidPlayer(3));
+        let result = game.startGame();
+        expect(result).to.be.true;
+        let p1 = game.getPlayerAt(1);
+        let p2 = game.getPlayerAt(2);
+        let p3 = game.getPlayerAt(3);
+        p1.sitOut = true;
+        p2.sitOut = true;
+        p3.sitOut = true;
+        result = game.startHand();
+        expect(result).to.be.false;
+      });
+    });
     context('and all players have no money', function(){
-
-    })
+      it('should set all players to sitout and return false', function(){
+        const gameSize = 3;
+        game = new Game("NL Holdem", [3, 1], gameSize);
+        game.addPlayer(createValidPlayer(3));
+        game.addPlayer(createValidPlayer(3));
+        game.addPlayer(createValidPlayer(3));
+        let result = game.startGame();
+        expect(result).to.be.true;
+        let p1 = game.getPlayerAt(1);
+        let p2 = game.getPlayerAt(2);
+        let p3 = game.getPlayerAt(3);
+        p1.money = 0;
+        p2.money = 0;
+        p3.money = 0;
+        result = game.startHand();
+        expect(result).to.be.false;
+        expect(p1.sitOut).to.be.true;
+        expect(p2.sitOut).to.be.true;
+        expect(p3.sitOut).to.be.true;
+      });
+    });
     context('and all but one player has no money', function(){
       
-    })
+    });
     context('and all players are sitting out', function(){
 
-    })
+    });
     context('and all but one player is sitting out', function(){
       
-    })
+    });
     context('and all players fold', function(){
       it('big blind wins', function(){
 
-      }) 
+      });
     });
     context('and all players go all in', function(){
        context('and everyone has equal money', function(){
